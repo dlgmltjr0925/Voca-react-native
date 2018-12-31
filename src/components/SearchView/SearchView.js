@@ -39,7 +39,6 @@ class SearchView extends Component {
         isShowAddWord: false,
       },
       webURI: '',
-      isShowWebResult: false
     }
   }
 
@@ -59,23 +58,23 @@ class SearchView extends Component {
 
   _openAddWord = () => {
     const isShowAddWord = this.state.searchBar.isShowAddWord ? false : true;
-    this.setState({
-      ...this.state,
-      searchBar: {
-        ...this.state.searchBar,
-        isShowAddWord,
-      }
-    });
+    this.setState({searchBar: {...this.state.searchBar, isShowAddWord}})
+  }
+
+  _onChangeWord = word => {
+    if (!this.state.searchBar.isShowAddWord) this.setState({searchBar: {...this.state.searchBar, word }, webURI: ''})
+    else this.setState({searchBar: {...this.state.searchBar, word}})
   }
 
   // 네이버 사전에 단어를 검색
-  _searchWebView = (searchWord) => {
-    const webURI = 'https://m.search.naver.com/search.naver?query=' + searchWord + '&where=m_ldic&sm=msv_hty';
+  _searchWebView = () => {
+    const webURI = 'https://m.search.naver.com/search.naver?query=' + this.state.searchBar.word + '&where=m_ldic&sm=msv_hty';
     this.setState({ webURI })
   }
 
   // 단어를 저장
   _saveWord = async () => {
+
     if (this.state.searchBar.word === '') {
       this.inputs['word'].focus();
       return alert('단어를 입력하세요.')
@@ -151,19 +150,6 @@ class SearchView extends Component {
     })
   }
 
-  // onChangeTextWord
-  _onChangeTextWord = (word) => {
-    // if (this.)
-    // if (this.state.isShow) this.setState({ ...this.state, searchBar: { ...this.state.searchBar, word, isShowAddWord: false } })
-    // else this.setState({ ...this.state, searchBar: { ...this.state.searchBar, word } })
-  }
-
-  // onChangeTextMean
-  _onChangeTextMean = (mean) => {
-    this.setState({ ...this.state, searchBar: { ...this.state.searchBar, mean } })
-  }
-
-  // 
   _getWordContent = () => {
     const contents = []
     const reg = new RegExp(this.state.searchBar.word);
@@ -223,21 +209,21 @@ class SearchView extends Component {
         />
       )
     }
-    const SearchWebView = (props) => {
-      const uri = this.state.webURI
-      return (
-        <WebView style={{ flex: 1, }} source={{ uri }} />
-      )
-    }
     return (
       <View style={[styles.container, { backgroundColor: colors.mainContainer }]}>
         <Header style={[styles.headerContainer, { flexDirection: 'column', justifyContent: 'flex-start' },]}>
           <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
-            <WordInput style={styles.searchBar}
+            <TextInput style={styles.searchBar}
               placeholder={!searchBar.isShowAddWord ? searchBar.placeholder1 : searchBar.placeholder2}
+              clearButtonMode={'while-editing'}
               returnKeyType={!searchBar.isShowAddWord ? 'search' : 'next'}
+              blurOnSubmit={false}
+              autoCorrect={false}
+              autoCapitalize={'none'}
+              onChangeText={this._onChangeWord}
               onSubmitEditing={!searchBar.isShowAddWord ? this._searchWebView : () => this.inputs['mean'].focus()}
-              reference={input => this.inputs['word'] = input}
+              value={this.state.searchBar.word}
+              ref={input => this.inputs['word'] = input}
             />
             <TouchableOpacity style={{ paddingTop: 10, marginRight: 10, flexDirection: 'column', justifyContent: 'center' }}
               onPress={this._openAddWord}>
@@ -249,15 +235,16 @@ class SearchView extends Component {
           </View>
           {!searchBar.isShowAddWord ? null :
             <View style={{ flexDirection: 'column', justifyContent: 'flex-start' }}>
-              <TextInput style={[styles.searchBar, { flex: 0, height: 30, }]}
+              <TextInput style={[styles.searchBar, { flex: 0, height: 30 }]}
                 placeholder={searchBar.placeholder3}
                 clearButtonMode={'while-editing'}
                 clearTextOnFocus={false}
                 returnKeyType={'done'}
                 autoCorrect={false}
                 autoCapitalize={'none'}
-                onChangeText={this._onChangeTextMean}
+                onChangeText={mean => this.setState({ searchBar: { ...this.state.searchBar, mean } })}
                 onSubmitEditing={this._saveWord}
+                value={this.state.searchBar.mean}
                 ref={input => this.inputs['mean'] = input}
               />
               <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginTop: 5 }}>
@@ -275,32 +262,18 @@ class SearchView extends Component {
           }
         </Header>
         <View style={{ flex: 1 }}>
-          {this.state.webURI === '' ? <SearchStorageView /> : <SearchWebView />}
+          {this.state.webURI === '' ? <SearchStorageView /> : <SearchWebView source={{ uri: this.state.webURI }} />}
         </View>
       </View>
     )
   }
 }
 
-class WordInput extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      word: '',
-    }
-  }
+class SearchWebView extends Component {
   render() {
     return (
-      <TextInput style={this.props.style}
-        placeholder={this.props.placeholder}
-        clearButtonMode={'while-editing'}
-        returnKeyType={this.props.returnKeyType}
-        blurOnSubmit={false}
-        autoCorrect={false}
-        autoCapitalize={'none'}
-        onChangeText={word => this.setState({ word })}
-        onSubmitEditing={() => this.props.onSubmitEditing(this.state.word)}
-        ref={input => this.props.reference(input)}
+      <WebView style={{ flex: 1, }}
+        source={this.props.source}
       />
     )
   }
