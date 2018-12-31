@@ -1,8 +1,8 @@
 import * as types from './configTypes';
 
-export const loadSetting = (config) => {
+export const loadConfig = (config) => {
   return {
-    type: types.LOAD_SETTING,
+    type: types.LOAD_CONFIG,
     config
   }
 }

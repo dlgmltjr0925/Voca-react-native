@@ -1,3 +1,9 @@
 import SearchView from './SearchView'
+import SearchNavigator from './SearchNavigator';
+import WordView from './WordView';
 
-export default SearchView;
+export {
+  SearchView,
+  SearchNavigator,
+  WordView
+}

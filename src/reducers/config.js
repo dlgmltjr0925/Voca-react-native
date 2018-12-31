@@ -5,10 +5,10 @@ const initialState = {
   config: configs.baseConfig
 }
 
-const configReducer = (state = initialState, action) => {
+const config = (state = initialState, action) => {
   switch (action.type) {
     // 저장된 세팅값을 불러오기
-    case types.LOAD_SETTING:
+    case types.LOAD_CONFIG:
       return {
         ...state,
         config: action.config
@@ -18,4 +18,4 @@ const configReducer = (state = initialState, action) => {
   }
 }
 
-export default configReducer;
+export default config;

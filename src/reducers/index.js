@@ -1,8 +1,10 @@
 import { combineReducers } from 'redux';
-import configReducer from './configReducer';
+import config from './config';
+import word from './word'
 
 const reducers = combineReducers({
-  configReducer, 
+  config, 
+  word,
 })
 
 export default reducers;

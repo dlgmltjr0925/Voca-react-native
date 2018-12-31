@@ -1,1 +1,1 @@
-export const LOAD_SETTING='LOAD_SETTING';
+export const LOAD_CONFIG='LOAD_CONFIG';
