@@ -5,7 +5,8 @@ import { baseStyle } from '../assets/styles'
 const baseConfig = {
   colors: baseColor,
   styles: baseStyle,
-  fonts: fonts
+  fonts: fonts,
+  examCount: 30,
 }
 
 export default baseConfig;
