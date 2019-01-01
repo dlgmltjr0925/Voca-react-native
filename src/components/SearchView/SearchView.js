@@ -74,7 +74,6 @@ class SearchView extends Component {
 
   // 단어를 저장
   _saveWord = async () => {
-
     if (this.state.searchBar.word === '') {
       this.inputs['word'].focus();
       return alert('단어를 입력하세요.')
@@ -97,14 +96,20 @@ class SearchView extends Component {
             text: '수 정', onPress: () => {
               newWords[word] = {
                 ...newWords[word], means,
-                updateDate: now
+                updateDate: now,
+                level: newWords[word].level < 3 ? 3 : newWords[word].level
               }
               this._saveWordToStore(newWords)
             }
           },
           {
             text: '추 가', onPress: () => {
-              means.forEach(mean => newWords[word].means.push(mean))
+              newWords[word].means.forEach(mean => means.push(mean))
+              newWords[word] = {
+                ...newWords[word], means,
+                updateDate: now,
+                level: newWords[word].level < 3 ? 3 : newWords[word].level
+              }
               this._saveWordToStore(newWords)
             }
           }
@@ -217,7 +222,7 @@ class SearchView extends Component {
               placeholder={!searchBar.isShowAddWord ? searchBar.placeholder1 : searchBar.placeholder2}
               clearButtonMode={'while-editing'}
               returnKeyType={!searchBar.isShowAddWord ? 'search' : 'next'}
-              blurOnSubmit={false}
+              blurOnSubmit={true}
               autoCorrect={false}
               autoCapitalize={'none'}
               onChangeText={this._onChangeWord}

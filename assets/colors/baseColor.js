@@ -4,7 +4,7 @@ const baseColor = {
   word: ['#0B51B6', ],
   content: ['#505050', ],
   searchBody: '#E0E0E0',
-  level: ['#EEEEEE', '#CCCCCC', '#BBBBBB', '#AAAAAA', '#999999', '#8888888']
+  level: ['#EEEEEE', '#449F1B', '#5BDA62', '#CBD62F', '#D37B22', '#D02A21'],
 }
 
 export default baseColor;

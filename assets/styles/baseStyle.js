@@ -3,7 +3,8 @@ const baseStyle = {
   container: {
     flex: 1, 
     flexDirection: 'column',
-    justifyContent: 'flex-start'
+    justifyContent: 'flex-start',
+    backgroundColor: baseColor.mainContainer
   },
   headerContainer: {
     backgroundColor: baseColor.mainContainer,
