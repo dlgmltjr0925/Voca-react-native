@@ -1,6 +1,8 @@
 import React, { Component } from 'react'
 import { Text, StyleSheet, View, AsyncStorage, ScrollView, TouchableOpacity, Alert } from 'react-native'
 import { connect } from "react-redux";
+
+import { configActions, wordActions } from '../../actions'
 import { Header } from '../Share'
 
 class SettingView extends Component {
@@ -25,6 +27,7 @@ class SettingView extends Component {
     const newWords = {}
     await AsyncStorage.removeItem('WORDS')
     await AsyncStorage.setItem('WORDS', JSON.stringify(newWords))
+    this.props.handleUpdateWord(newWords)
   }
 
   render() {
