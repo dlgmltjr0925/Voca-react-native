@@ -173,6 +173,9 @@ class SearchView extends Component {
         contents.push(content)
       };
     });
+    contents.sort((a, b) => {
+      return a.updateDate > b.updateDate ? -1 : a.updateDate < b.updateDate ? 1 : 0
+    })
     return contents;
   }
 

@@ -42,16 +42,18 @@ class ExamView extends Component {
 			})
 		})
 		for (let i = 0; i < 6; i++) {
-			if (i !== 0) {
-				data[i].sort((a, b) => {
-					return a.date > b.date ? -1 : a.date < b.date ? 1 : 0
-				})
-			} else {
-				data[i].sort((a, b) => {
-					return a.date < b.date ? -1 : a.date > b.date ? 1 : 0
-				})
-			}
-
+			data[i].sort((a, b) => {
+				return a.date < b.date ? -1 : a.date > b.date ? 1 : 0
+			})
+			// if (i !== 0) {
+			// 	data[i].sort((a, b) => {
+			// 		return a.date > b.date ? -1 : a.date < b.date ? 1 : 0
+			// 	})
+			// } else {
+			// 	data[i].sort((a, b) => {
+			// 		return a.date < b.date ? -1 : a.date > b.date ? 1 : 0
+			// 	})
+			// }
 		}
 		for (let i = 5; i > -1; i--) {
 			data[i].forEach((word) => examData.push(word));
