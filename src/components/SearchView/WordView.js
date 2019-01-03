@@ -35,7 +35,8 @@ class WordView extends Component {
       item,
       word: item.word,
       means: item.means,
-      memos: item.memos
+      memos: item.memos,
+      isEditing: false,
     }
     this._deleteWord = this._deleteWord.bind(this)
     this.props.handleUpdateWord = this.props.handleUpdateWord.bind(this)
@@ -90,6 +91,23 @@ class WordView extends Component {
     })
   }
 
+  _saveEditMean = () => {
+    const newWords = {...this.props.words}
+    newWords[this.state.word].means = [...this.state.means]
+    AsyncStorage.mergeItem('WORDS', JSON.stringify(newWords), (err) => {
+      if (err) throw err;
+      this.props.handleUpdateWord(newWords);
+      this.setState({isEditing: false})
+    })
+  }
+
+  _cancelEditMean = () => {
+    this.setState({
+      isEditing: false,
+      means: this.props.words[this.state.word].means
+    })
+  }
+
   render() {
     const colors = this.props.config.colors;
     const styles = this.props.config.styles;
@@ -98,7 +116,25 @@ class WordView extends Component {
       <View style={{ flex: 1, flexDirection: 'column', backgroundColor: '#FCFCFC' }}>
         <CardView style={{ flexDirection: 'column', }}
           activeOpacity={0.8}>
-          <Text style={[{ marginTop: 50, marginBottom: 50 }, fonts.cardWord2]}>{this.state.word}</Text>
+          {this.state.isEditing
+            ? <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
+              <TouchableOpacity
+                onPress={this._saveEditMean}>
+                <Image style={{width: 20, height: 20, marginRight: 10}} source={require('../../../assets/icons/edit_save.png')} />
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={this._cancelEditMean}>
+                <Image style={{width: 20, height: 20}} source={require('../../../assets/icons/edit_cancel.png')} />
+              </TouchableOpacity>
+            </View>
+            : <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
+              <TouchableOpacity style={{ width: 20, height: 20, alignContent: 'flex-end', }}
+                onPress={() => this.setState({ isEditing: true })}>
+                <Image style={{ width: 20, height: 20 }} source={require('../../../assets/icons/card_edit.png')} />
+              </TouchableOpacity>
+            </View>
+          }
+          <Text style={[{ marginTop: 30, marginBottom: 50 }, fonts.cardWord2]}>{this.state.word}</Text>
           <View style={{ height: 1, backgroundColor: '#CCCCCC' }} />
           <FlatList style={{ marginTop: 20, }}
             data={this.state.means}

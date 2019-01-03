@@ -1,12 +1,10 @@
 import React, { Component } from 'react'
 import { Text, StyleSheet, View, TextInput, TouchableOpacity, Image, WebView, Alert, AsyncStorage, FlatList } from 'react-native'
 import { connect } from 'react-redux';
-import { StackNavigator } from 'react-navigation'
 
 import Header from './Header'
 import { configActions, wordActions } from '../../actions'
 import { CardView } from '../Share';
-import WordView from './WordView';
 
 const initWord = {
   means: [],
@@ -176,6 +174,8 @@ class SearchView extends Component {
     contents.sort((a, b) => {
       return a.updateDate > b.updateDate ? -1 : a.updateDate < b.updateDate ? 1 : 0
     })
+    contents.forEach((word, index) => word['key'] = index.toString())
+    // alert(JSON.stringify(contents))
     return contents;
   }
 
@@ -198,7 +198,7 @@ class SearchView extends Component {
       return (
         <FlatList
           data={contents}
-          keyExtractor={(item, index) => item.word}
+          keyExtractor={(item, index) => item.key}
           renderItem={({ item }) => (
             <CardView style={{ flexDirection: 'column' }}
               onPress={() => {
@@ -229,7 +229,7 @@ class SearchView extends Component {
               autoCorrect={false}
               autoCapitalize={'none'}
               onChangeText={this._onChangeWord}
-              onSubmitEditing={!searchBar.isShowAddWord ? this._searchWebView : () => this.inputs['mean'].focus()}
+              onSubmitEditing={!searchBar.isShowAddWord ? this._searchWebView : () => {this._searchWebView(); this.inputs['mean'].focus()}}
               value={this.state.searchBar.word}
               ref={input => this.inputs['word'] = input}
             />

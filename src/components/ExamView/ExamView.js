@@ -59,7 +59,6 @@ class ExamView extends Component {
 			data[i].forEach((word) => examData.push(word));
 		}
 		examData.forEach((word, index) => word['key'] = index.toString())
-		console.log(examData)
 		this.setState({ data, examData })
 	}
 
