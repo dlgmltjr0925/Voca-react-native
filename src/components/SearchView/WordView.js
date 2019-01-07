@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Text, StyleSheet, View, TouchableOpacity, Image, FlatList, TextInput, Alert, AsyncStorage, ScrollView } from 'react-native'
+import { Text, StyleSheet, View, TouchableOpacity, Image, FlatList, TextInput, Alert, AsyncStorage, ScrollView, Keyboard, Platform } from 'react-native'
 import { configActions, wordActions } from '../../actions';
 import { connect } from 'react-redux';
 
@@ -33,14 +33,10 @@ class WordView extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      item: this.props.navigation.state.params.item
+      item: this.props.navigation.state.params.item,
     };
     this._deleteWord = this._deleteWord.bind(this);
-    this.props.handleUpdateWord = this.props.handleUpdateWord.bind(this)
-  }
-
-  componentDidMount = () => {
-    this.props.navigation.setParams({ deleteWord: this._deleteWord })
+    this.props.handleUpdateWord = this.props.handleUpdateWord.bind(this);
   }
 
   componentWillReceiveProps = () => {
@@ -91,17 +87,19 @@ class WordView extends Component {
 
   render() {
     return (
-      <ScrollView style={{ flex: 1, flexDirection: 'column', backgroundColor: '#FCFCFC' }}>
-        <WordCard
-          item={this.state.item}
-          config={this.props.config}
-          saveEditMean={this._saveEditMean}
-        />
-        <MemoView
-          item={this.state.item}
-          saveEditMemo={this._saveEditMemo}
-        />
-      </ScrollView>
+      <View style={{flex: 1, backgroundColor: '#FCFCFC',}}>
+        <ScrollView style={{ flex: 1, flexDirection: 'column'}}>
+          <WordCard
+            item={this.state.item}
+            config={this.props.config}
+            saveEditMean={this._saveEditMean}
+          />
+          <MemoView
+            item={this.state.item}
+            saveEditMemo={this._saveEditMemo}
+          />
+        </ScrollView>
+      </View>
     )
   }
 }

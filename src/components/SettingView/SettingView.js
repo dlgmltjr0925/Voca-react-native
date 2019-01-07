@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Text, StyleSheet, View, AsyncStorage, ScrollView, TouchableOpacity, Alert } from 'react-native'
+import { Text, StyleSheet, View, AsyncStorage, ScrollView, TouchableOpacity, Alert, Picker } from 'react-native'
 import { connect } from "react-redux";
 
 import { configActions, wordActions } from '../../actions'
@@ -18,7 +18,7 @@ class SettingView extends Component {
 
   _clearWord = () => {
     Alert.alert('삭 제', '저장된 데이터를 모두 삭제하시겠습니까?', [
-      { text: 'Yes', onPress: () => this._clearWordFromStorage()},
+      { text: 'Yes', onPress: () => this._clearWordFromStorage() },
       { text: 'No', }
     ])
   }
@@ -34,7 +34,7 @@ class SettingView extends Component {
     const style = this.props.config.styles
     return (
       <View style={[style.container]}>
-        <Header style={[style.headerContainer, {marginTop: 5}]}>
+        <Header style={[style.headerContainer, { marginTop: 5 }]}>
           <Text style={{ marginTop: 10, fontSize: 18, fontWeight: 'bold', textAlign: 'center' }}>Setting</Text>
         </Header>
         <ScrollView>
@@ -55,7 +55,6 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
     fontSize: 20,
     fontWeight: 'bold',
-
   }
 })
 

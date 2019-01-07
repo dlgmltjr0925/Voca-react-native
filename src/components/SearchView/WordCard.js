@@ -136,7 +136,7 @@ const MeanView = (props) => {
 }
 
 const AddView = (props) => (
-  <View style={{ flex: 1, flexDirection: 'row', marginRight: 20, paddingTop: 5, paddingBottom: 5}}>
+  <View style={{ flex: 1, flexDirection: 'row', marginRight: 20, paddingTop: 5, paddingBottom: 20}}>
     <TouchableOpacity style={{ width: 40, paddingLeft: 10, justifyContent: 'center', alignItems: 'center' }}
       onPress={props.addMean}>
       <Image style={{ width: 22, height: 22 }} source={require('../../../assets/icons/edit_add.png')} />

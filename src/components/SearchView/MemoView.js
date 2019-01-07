@@ -46,7 +46,7 @@ export default class MemoView extends Component {
     const memos = this.state.memos.map(memoObj => ({ ...memoObj }))
     memos.map((memo, index) => memo.key = index.toString())
     return (
-      <View style={{ flexDirection: 'column', }}>
+      <View style={{ flexDirection: 'column', marginBottom: 300}}>
         <FlatList
           data={memos}
           keyExtractor={(item) => item.key}

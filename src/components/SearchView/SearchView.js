@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Text, StyleSheet, View, TextInput, TouchableOpacity, Image, WebView, Alert, AsyncStorage, FlatList } from 'react-native'
+import { Text, StyleSheet, View, TextInput, TouchableOpacity, Image, WebView, Alert, AsyncStorage, FlatList, Keyboard, Dimensions, Platform } from 'react-native'
 import { connect } from 'react-redux';
 
 import Header from './Header'
@@ -25,6 +25,8 @@ class SearchView extends Component {
     this.inputs = {};
     this.props.handleLoadConfig = this.props.handleLoadConfig.bind(this);
     this.props.handleUpdateWord = this.props.handleUpdateWord.bind(this);
+    this._keyboardDidShow = this._keyboardDidShow.bind(this);
+    this._keyboardDidHide = this._keyboardDidHide.bind(this);
     this.state = {
       words: this.props.words,
       searchBar: {
@@ -37,12 +39,27 @@ class SearchView extends Component {
         isShowAddWord: false,
       },
       webURI: '',
+      keyboardHight: 0, 
     }
   }
 
-  componentWillMount() {
-    // if (Object.keys(this.props.words).length > 0) this.print(this.props.words)
-    // this._getWordContent()
+  componentDidMount() {
+    this.keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', this._keyboardDidShow);
+    this.keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', this._keyboardDidHide);
+  }
+
+  componentWillUnmount() {
+    this.keyboardDidShowListener.remove();
+    this.keyboardDidHideListener.remove();
+  }
+
+  _keyboardDidShow(e) {
+    const height = parseInt(Platform.Version, 10) >= 12 ? 32 : 20
+    this.setState({ keyboardHight: e.endCoordinates.height - height - 50})
+  }
+
+  _keyboardDidHide() {
+    this.setState({ keyboardHight: 0, })
   }
 
   print = (obj) => {
@@ -56,12 +73,12 @@ class SearchView extends Component {
 
   _openAddWord = () => {
     const isShowAddWord = this.state.searchBar.isShowAddWord ? false : true;
-    this.setState({searchBar: {...this.state.searchBar, isShowAddWord}})
+    this.setState({ searchBar: { ...this.state.searchBar, isShowAddWord } })
   }
 
   _onChangeWord = word => {
-    if (!this.state.searchBar.isShowAddWord) this.setState({searchBar: {...this.state.searchBar, word }, webURI: ''})
-    else this.setState({searchBar: {...this.state.searchBar, word}})
+    if (!this.state.searchBar.isShowAddWord) this.setState({ searchBar: { ...this.state.searchBar, word }, webURI: '' })
+    else this.setState({ searchBar: { ...this.state.searchBar, word } })
   }
 
   // 네이버 사전에 단어를 검색
@@ -102,7 +119,7 @@ class SearchView extends Component {
               }
               this._saveWordToStore(newWords)
             }
-          }, 
+          },
           {
             text: `대  체`, onPress: () => {
               newWords[word] = {
@@ -132,9 +149,6 @@ class SearchView extends Component {
         },
         { text: 'No', onPress: () => isChanged = false }
         ])
-    }
-    if (isChanged) {
-
     }
   }
 
@@ -201,7 +215,7 @@ class SearchView extends Component {
     const SearchStorageView = (props) => {
       const contents = this._getWordContent();
       return (
-        <FlatList
+        <FlatList style={{ flex: 1}}
           data={contents}
           keyExtractor={(item, index) => item.key}
           renderItem={({ item }) => (
@@ -234,7 +248,7 @@ class SearchView extends Component {
               autoCorrect={false}
               autoCapitalize={'none'}
               onChangeText={this._onChangeWord}
-              onSubmitEditing={!searchBar.isShowAddWord ? this._searchWebView : () => {this._searchWebView(); this.inputs['mean'].focus()}}
+              onSubmitEditing={!searchBar.isShowAddWord ? this._searchWebView : () => { this._searchWebView(); this.inputs['mean'].focus() }}
               value={this.state.searchBar.word}
               ref={input => this.inputs['word'] = input}
             />
@@ -274,7 +288,7 @@ class SearchView extends Component {
             </View>
           }
         </Header>
-        <View style={{ flex: 1 }}>
+        <View style={{ flex: 1, marginBottom: this.state.keyboardHight}}>
           {this.state.webURI === '' ? <SearchStorageView /> : <SearchWebView source={{ uri: this.state.webURI }} />}
         </View>
       </View>
