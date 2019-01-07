@@ -1,1 +1,2 @@
 export const LOAD_CONFIG='LOAD_CONFIG';
+export const UPDATE_CONFIG='UPDATE_CONFIG'

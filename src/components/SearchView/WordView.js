@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Text, StyleSheet, View, TouchableOpacity, Image, FlatList, TextInput, Alert, AsyncStorage, ScrollView, Keyboard, Platform } from 'react-native'
+import { Text, StyleSheet, View, TouchableOpacity, Image, FlatList, TextInput, Alert, AsyncStorage, ScrollView, Keyboard, Platform, KeyboardAvoidingView } from 'react-native'
 import { configActions, wordActions } from '../../actions';
 import { connect } from 'react-redux';
 
@@ -87,7 +87,7 @@ class WordView extends Component {
 
   render() {
     return (
-      <View style={{flex: 1, backgroundColor: '#FCFCFC',}}>
+      <KeyboardAvoidingView style={{flex: 1, backgroundColor: '#FCFCFC',}} behavior="padding" enabled>
         <ScrollView style={{ flex: 1, flexDirection: 'column'}}>
           <WordCard
             item={this.state.item}
@@ -99,7 +99,7 @@ class WordView extends Component {
             saveEditMemo={this._saveEditMemo}
           />
         </ScrollView>
-      </View>
+      </KeyboardAvoidingView>
     )
   }
 }

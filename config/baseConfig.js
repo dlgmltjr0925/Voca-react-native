@@ -6,7 +6,11 @@ const baseConfig = {
   colors: baseColor,
   styles: baseStyle,
   fonts: fonts,
-  examCount: 20,
+  exam: {
+    examCount: 20,
+    highLevel: 5,
+    lowLevel: 0, 
+  }
 }
 
 export default baseConfig;

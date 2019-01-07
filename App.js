@@ -71,7 +71,7 @@ class App extends Component {
   }
 
   _loadConfigFromAsyncStore = async () => {
-    if (process.env !== 'prd') await AsyncStorage.removeItem('CONFIG');
+    // if (process.env !== 'prd') await AsyncStorage.removeItem('CONFIG');
     let config = JSON.parse(await AsyncStorage.getItem('CONFIG')); // key : CONFIG
     if (!config) {
       config = this.props.config;

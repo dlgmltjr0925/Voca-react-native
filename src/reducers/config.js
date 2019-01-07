@@ -13,6 +13,11 @@ const config = (state = initialState, action) => {
         ...state,
         config: action.config
       }
+    case types.UPDATE_CONFIG:
+      return {
+        ...state,
+        config: action.config
+      }
     default:
       return state;
   }

@@ -6,3 +6,10 @@ export const loadConfig = (config) => {
     config
   }
 }
+
+export const updateConfig = (config) => {
+  return {
+    type: types.UPDATE_CONFIG,
+    config
+  }
+}

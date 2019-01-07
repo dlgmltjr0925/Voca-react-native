@@ -15,7 +15,7 @@ class ExamView extends Component {
 		this.state = {
 			data: null,
 			dataCount: 0,
-			examCount: this.props.config.examCount,
+			examCount: this.props.config.exam.examCount,
 		}
 		this.props.handleLoadConfig = this.props.handleLoadConfig.bind(this)
 		this.props.handleUpdateWord = this.props.handleUpdateWord.bind(this)
@@ -42,12 +42,12 @@ class ExamView extends Component {
 			})
 			dataCount += 1;
 		})
-		for (let i = 0; i < 6; i++) {
+		for (let i = this.props.config.exam.lowLevel; i <= this.props.config.exam.highLevel; i++) {
 			data[i].sort((a, b) => {
 				return a.date < b.date ? -1 : a.date > b.date ? 1 : 0
 			})
 		}
-		this.setState({ data, dataCount, examCount: this.props.config.examCount })
+		this.setState({ data, dataCount, examCount: this.props.config.exam.examCount })
 	}
 
 	_levelUp = (word, index) => {
@@ -60,7 +60,7 @@ class ExamView extends Component {
 		this._saveWordToStore(newWords)
 		const newData = [...this.state.data]
 		let dataCount = this.state.dataCount;
-		for (let i = 5; i > -1; i--) {
+		for (let i = this.props.config.exam.highLevel; i >= this.props.config.exam.lowLevel; i--) {
 			let length = newData[i].length
 			if (index - length >= 0) {
 				index -= length;
@@ -87,7 +87,7 @@ class ExamView extends Component {
 		newWords[word].updateDate = new Date();
 		this._saveWordToStore(newWords);
 		const newData = [...this.state.data]
-		for (let i = 5; i > -1; i--) {
+		for (let i = this.props.config.exam.highLevel; i >= this.props.config.exam.lowLevel; i--) {
 			let length = newData[i].length
 			if (index - length >= 0) {
 				index -= length;
@@ -109,7 +109,7 @@ class ExamView extends Component {
 	_getExamData = () => {
 		const examData = []
 		let count = 0;
-		for (let i = 5; i > -1; i--) {
+		for (let i = this.props.config.exam.highLevel; i >= this.props.config.exam.lowLevel; i--) {
 			this.state.data[i].map((word) => {
 				word['key'] = count.toString();
 				examData.push(word);

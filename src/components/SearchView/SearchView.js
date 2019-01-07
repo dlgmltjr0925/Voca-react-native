@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Text, StyleSheet, View, TextInput, TouchableOpacity, Image, WebView, Alert, AsyncStorage, FlatList, Keyboard, Dimensions, Platform } from 'react-native'
+import { Text, StyleSheet, View, TextInput, TouchableOpacity, Image, WebView, Alert, AsyncStorage, FlatList, Keyboard, Dimensions, Platform, KeyboardAvoidingView } from 'react-native'
 import { connect } from 'react-redux';
 
 import Header from './Header'
@@ -25,8 +25,6 @@ class SearchView extends Component {
     this.inputs = {};
     this.props.handleLoadConfig = this.props.handleLoadConfig.bind(this);
     this.props.handleUpdateWord = this.props.handleUpdateWord.bind(this);
-    this._keyboardDidShow = this._keyboardDidShow.bind(this);
-    this._keyboardDidHide = this._keyboardDidHide.bind(this);
     this.state = {
       words: this.props.words,
       searchBar: {
@@ -39,28 +37,9 @@ class SearchView extends Component {
         isShowAddWord: false,
       },
       webURI: '',
-      keyboardHight: 0, 
     }
   }
 
-  componentDidMount() {
-    this.keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', this._keyboardDidShow);
-    this.keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', this._keyboardDidHide);
-  }
-
-  componentWillUnmount() {
-    this.keyboardDidShowListener.remove();
-    this.keyboardDidHideListener.remove();
-  }
-
-  _keyboardDidShow(e) {
-    const height = parseInt(Platform.Version, 10) >= 12 ? 32 : 20
-    this.setState({ keyboardHight: e.endCoordinates.height - height - 50})
-  }
-
-  _keyboardDidHide() {
-    this.setState({ keyboardHight: 0, })
-  }
 
   print = (obj) => {
     if (typeof obj === 'object') alert(JSON.stringify(obj))
@@ -237,7 +216,7 @@ class SearchView extends Component {
       )
     }
     return (
-      <View style={[styles.container, { backgroundColor: colors.mainContainer }]}>
+      <KeyboardAvoidingView style={[styles.container, { backgroundColor: colors.mainContainer }]} behavior="padding" enabled>
         <Header style={[styles.headerContainer, { flexDirection: 'column', justifyContent: 'flex-start' },]}>
           <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
             <TextInput style={styles.searchBar}
@@ -288,10 +267,10 @@ class SearchView extends Component {
             </View>
           }
         </Header>
-        <View style={{ flex: 1, marginBottom: this.state.keyboardHight}}>
+        <View style={{ flex: 1}}>
           {this.state.webURI === '' ? <SearchStorageView /> : <SearchWebView source={{ uri: this.state.webURI }} />}
         </View>
-      </View>
+      </KeyboardAvoidingView>
     )
   }
 }
