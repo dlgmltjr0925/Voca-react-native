@@ -88,10 +88,23 @@ class SearchView extends Component {
     const now = new Date()
     if (newWords[word] !== undefined) {
       // 이미 등록된 단어일 경우
-      Alert.alert('단어 수정', '기존에 등록된 단어가 있습니다. \n단어의 뜻을 "수정"하시겠습니까? \n단어의 뜻에 "추가"하시겠습니까?',
+      let content = ``
+      newWords[word].means.map((obj, index) => content += `${index + 1}. ${obj.mean}\n`)
+      Alert.alert(`${word}`, `${content}\n 기존에 등록된 단어가 있습니다. \n단어의 뜻을 변경하시겠습니까?`,
         [
           {
-            text: '수 정', onPress: () => {
+            text: '추  가', onPress: () => {
+              newWords[word].means.forEach(mean => means.push(mean))
+              newWords[word] = {
+                ...newWords[word], means,
+                updateDate: now,
+                level: newWords[word].level < 3 ? 3 : newWords[word].level
+              }
+              this._saveWordToStore(newWords)
+            }
+          }, 
+          {
+            text: `대  체`, onPress: () => {
               newWords[word] = {
                 ...newWords[word], means,
                 updateDate: now,
@@ -101,15 +114,7 @@ class SearchView extends Component {
             }
           },
           {
-            text: '추 가', onPress: () => {
-              newWords[word].means.forEach(mean => means.push(mean))
-              newWords[word] = {
-                ...newWords[word], means,
-                updateDate: now,
-                level: newWords[word].level < 3 ? 3 : newWords[word].level
-              }
-              this._saveWordToStore(newWords)
-            }
+            text: '취  소', onPress: null
           }
         ])
     } else {
@@ -155,16 +160,16 @@ class SearchView extends Component {
 
   _getWordContent = () => {
     const contents = []
-    const reg = new RegExp(this.state.searchBar.word);
+    const regExp = new RegExp(this.state.searchBar.word);
     const keys = Object.keys(this.props.words);
     keys.forEach(word => {
       let content = null;
-      if (reg.test(word)) {
+      if (regExp.test(word)) {
         content = { ...this.props.words[word] }
       } else {
         const temp = { ...this.props.words[word] }
-        temp.means.forEach(mean => { if (reg.test(mean) && content !== temp) content = temp })
-        temp.memos.forEach(memo => { if (req.test(memo) && content !== temp) content = temp })
+        temp.means.forEach(mean => { if (regExp.test(mean) && content !== temp) content = temp })
+        temp.memos.forEach(memo => { if (regExp.test(memo) && content !== temp) content = temp })
       }
       if (content) {
         content['word'] = word

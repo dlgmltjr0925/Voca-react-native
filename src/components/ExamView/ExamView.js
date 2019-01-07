@@ -14,7 +14,7 @@ class ExamView extends Component {
 		super(props);
 		this.state = {
 			data: null,
-			examData: null,
+			dataCount: 0,
 			examCount: this.props.config.examCount,
 		}
 		this.props.handleLoadConfig = this.props.handleLoadConfig.bind(this)
@@ -25,14 +25,14 @@ class ExamView extends Component {
 		this._setData();
 	}
 
-	componentWillReceiveProps() {
-		this._setData();
-	}
+	// componentWillReceiveProps() {
+	// 	this._setData();
+	// }
 
 	_setData = () => {
 		const data = [[], [], [], [], [], []];
-		const examData = [];
 		const keys = Object.keys(this.props.words)
+		let dataCount = 0;
 		keys.forEach(word => {
 			data[this.props.words[word].level].push({
 				word,
@@ -40,83 +40,110 @@ class ExamView extends Component {
 				date: this.props.words[word].updateDate,
 				level: this.props.words[word].level
 			})
+			dataCount += 1;
 		})
 		for (let i = 0; i < 6; i++) {
 			data[i].sort((a, b) => {
 				return a.date < b.date ? -1 : a.date > b.date ? 1 : 0
 			})
-			// if (i !== 0) {
-			// 	data[i].sort((a, b) => {
-			// 		return a.date > b.date ? -1 : a.date < b.date ? 1 : 0
-			// 	})
-			// } else {
-			// 	data[i].sort((a, b) => {
-			// 		return a.date < b.date ? -1 : a.date > b.date ? 1 : 0
-			// 	})
-			// }
 		}
-		for (let i = 5; i > -1; i--) {
-			data[i].forEach((word) => examData.push(word));
-		}
-		examData.forEach((word, index) => word['key'] = index.toString())
-		this.setState({ data, examData })
+		this.setState({ data, dataCount, examCount: this.props.config.examCount })
 	}
 
-	_initExam = () => {
-		this.setState({
-			examCount: this.props.config.examCount
-		})
-	}
-
-	_levelUp = (word) => {
+	_levelUp = (word, index) => {
+		// 스토리지 저장
 		const newWords = { ...this.props.words }
 		if (newWords[word].level !== 5) {
 			newWords[word].level += 1;
 		}
 		newWords[word].updateDate = new Date();
-		this._saveWordToStore(newWords).then(() => {
-			if (this.state.examCount === 1 ||
-				this.state.examData.slice(this.props.config.examCount - this.state.examCount, this.props.config.examCount).length === 1) this._initExam()
-			else this.setState({ examCount: this.state.examCount - 1 })
-		})
+		this._saveWordToStore(newWords)
+		const newData = [...this.state.data]
+		let dataCount = this.state.dataCount;
+		for (let i = 5; i > -1; i--) {
+			let length = newData[i].length
+			if (index - length >= 0) {
+				index -= length;
+			} else {
+				newData[i].splice(index, 1);
+				dataCount -= 1;
+				break;
+			}
+		}
+		// console.log(`${this.state.examCount} ${dataCount}`)
+		if (this.state.examCount === 1 || dataCount === 0) {
+			this._setData()
+		} else {
+			this.setState({ data: newData, dataCount, examCount: this.state.examCount - 1 })
+		}
 	}
 
-	_levelDown = (word) => {
+	_levelDown = (word, index) => {
+		// 스토리지 저장
 		const newWords = { ...this.props.words }
 		if (newWords[word].level !== 0) {
 			newWords[word].level -= 1;
 		}
 		newWords[word].updateDate = new Date();
 		this._saveWordToStore(newWords);
+		const newData = [...this.state.data]
+		for (let i = 5; i > -1; i--) {
+			let length = newData[i].length
+			if (index - length >= 0) {
+				index -= length;
+			} else {
+				const word = newData[i].splice(index, 1)[0];
+				word.level = word.level !== 0 ? word.level - 1 : word.level
+				newData[word.level].push(word);
+				break;
+			}
+		}
+		this.setState({ data: newData,  })
 	}
 
 	_saveWordToStore = async (newWords) => {
-		this.props.handleUpdateWord(newWords);
 		await AsyncStorage.mergeItem('WORDS', JSON.stringify(newWords));
+		this.props.handleUpdateWord(newWords);
+	}
+
+	_getExamData = () => {
+		const examData = []
+		let count = 0;
+		for (let i = 5; i > -1; i--) {
+			this.state.data[i].map((word) => {
+				word['key'] = count.toString();
+				examData.push(word);
+				count += 1;
+			});
+			if (count > this.state.examCount) break;
+		}
+		return examData;
 	}
 
 	render() {
 		const style = this.props.config.styles
+		const examData = this._getExamData();
+		console.log()
 		return (
 			<View style={style.container}>
 				<Header style={[style.headerContainer, { marginTop: 5, flexDirection: 'row', justifyContent: 'space-between' }]}>
-					<View style={{ height: 30, width: 40}}/>
+					<View style={{ height: 30, width: 40 }} />
 					<Text style={{ marginTop: 10, fontSize: 18, fontWeight: 'bold', textAlign: 'center' }}>Exam</Text>
 					<View style={{ height: 30, width: 40 }}>
-						<TouchableOpacity style={{ flex: 1, padding: 10, paddingBottom: 0, marginRight: 10 }} onPress={this._initExam}>
+						<TouchableOpacity style={{ flex: 1, padding: 10, paddingBottom: 0, marginRight: 10 }} onPress={this._setData}>
 							<Image style={{ width: 23, height: 23, }} source={require('../../../assets/icons/exam_refresh.png')} />
 						</TouchableOpacity>
 					</View>
 				</Header>
 				<FlatList
-					data={this.state.examData.slice(this.props.config.examCount - this.state.examCount, this.props.config.examCount)}
+					data={examData.slice(0, this.state.examCount)}
 					keyExtractor={(item) => item.key}
-					renderItem={({ item }) => (
+					renderItem={({ item, index }) => (
 						<WordView
 							fonts={this.props.config.fonts}
 							colors={this.props.config.colors.level}
-							levelUp={() => this._levelUp(item.word)}
-							levelDown={() => this._levelDown(item.word)}
+							levelUp={() => this._levelUp(item.word, index)}
+							levelDown={() => this._levelDown(item.word, index)}
 							item={item}
 						/>
 					)}
@@ -145,7 +172,7 @@ class WordView extends Component {
 	_meansToString = (means) => {
 		let mean = '';
 		for (let i = 0; i < means.length; i++) {
-			mean += `${i + 1}. ${means[i].mean},  `
+			mean += `${i + 1}. ${means[i].mean}   `
 		}
 		return mean.slice(0, mean.length - 3)
 	}
