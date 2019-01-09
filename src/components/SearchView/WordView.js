@@ -39,6 +39,10 @@ class WordView extends Component {
     this.props.handleUpdateWord = this.props.handleUpdateWord.bind(this);
   }
 
+  componentDidMount = () => {
+    this.props.navigation.setParams({ deleteWord: this._deleteWord })
+  }
+
   componentWillReceiveProps = () => {
     // 단어 또는 메모가 수정되었을 경우 실행
     const word = this.props.words[this.state.item.word]
@@ -87,8 +91,8 @@ class WordView extends Component {
 
   render() {
     return (
-      <KeyboardAvoidingView style={{flex: 1, backgroundColor: '#FCFCFC',}} behavior="padding" enabled>
-        <ScrollView style={{ flex: 1, flexDirection: 'column'}}>
+      <KeyboardAvoidingView style={{ flex: 1, backgroundColor: '#FCFCFC', }} behavior="padding" enabled>
+        <ScrollView style={{ flex: 1, flexDirection: 'column' }}>
           <WordCard
             item={this.state.item}
             config={this.props.config}

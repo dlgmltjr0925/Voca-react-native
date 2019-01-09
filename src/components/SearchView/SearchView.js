@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Text, StyleSheet, View, TextInput, TouchableOpacity, Image, WebView, Alert, AsyncStorage, FlatList, Keyboard, Dimensions, Platform, KeyboardAvoidingView } from 'react-native'
+import { Text, StyleSheet, View, TextInput, TouchableOpacity, Image, WebView, Alert, AsyncStorage, FlatList, KeyboardAvoidingView, Switch } from 'react-native'
 import { connect } from 'react-redux';
 
 import Header from './Header'
@@ -36,10 +36,15 @@ class SearchView extends Component {
         mean: '',
         isShowAddWord: false,
       },
-      webURI: '',
+      webUri: '',
+      preWebUri: '', 
     }
   }
 
+  componentWillReceiveProps = () => {
+    alert
+    this.setState({ words: this.props.words })
+  }
 
   print = (obj) => {
     if (typeof obj === 'object') alert(JSON.stringify(obj))
@@ -56,14 +61,14 @@ class SearchView extends Component {
   }
 
   _onChangeWord = word => {
-    if (!this.state.searchBar.isShowAddWord) this.setState({ searchBar: { ...this.state.searchBar, word }, webURI: '' })
+    if (!this.state.searchBar.isShowAddWord) this.setState({ searchBar: { ...this.state.searchBar, word }, webUri: '' })
     else this.setState({ searchBar: { ...this.state.searchBar, word } })
   }
 
   // 네이버 사전에 단어를 검색
   _searchWebView = () => {
-    const webURI = 'https://m.search.naver.com/search.naver?query=' + this.state.searchBar.word + '&where=m_ldic&sm=msv_hty';
-    this.setState({ webURI })
+    const webUri = 'https://m.search.naver.com/search.naver?query=' + this.state.searchBar.word + '&where=m_ldic&sm=msv_hty';
+    this.setState({ webUri, preWebUri: webUri })
   }
 
   // 단어를 저장
@@ -131,14 +136,13 @@ class SearchView extends Component {
     }
   }
 
-  // 단어 저장을 취소 함 (Add 초기화) 
   _saveWordToStore = async (newWords) => {
     this.props.handleUpdateWord(newWords);
     await AsyncStorage.mergeItem('WORDS', JSON.stringify(newWords));
-    this._clearAddWord()
+    this._clearAddWord('')
   }
 
-  _clearAddWord = () => {
+  _clearAddWord = (webUri = this.state.webUri) => {
     this.inputs['word'].clear();
     this.inputs['mean'].clear();
     this.inputs['word'].focus();
@@ -146,8 +150,9 @@ class SearchView extends Component {
       searchBar: {
         ...this.state.searchBar,
         word: '',
-        mean: ''
-      }
+        mean: '',
+      },
+      webUri,
     })
   }
 
@@ -194,7 +199,7 @@ class SearchView extends Component {
     const SearchStorageView = (props) => {
       const contents = this._getWordContent();
       return (
-        <FlatList style={{ flex: 1}}
+        <FlatList style={{ flex: 1 }}
           data={contents}
           keyExtractor={(item, index) => item.key}
           renderItem={({ item }) => (
@@ -203,7 +208,9 @@ class SearchView extends Component {
                 this.props.navigation.navigate('Word', {
                   item,
                 })
-              }}>
+              }}
+              onLongPress={() => this.setState({ webUri: `https://m.search.naver.com/search.naver?query=${item.word}&where=m_ldic&sm=msv_hty` })}
+            >
               <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                 <Text style={[{ marginBottom: 10, }, fonts.cardWord]}>{item.word}</Text>
                 <Level level={item.level} />
@@ -228,7 +235,7 @@ class SearchView extends Component {
               autoCapitalize={'none'}
               onChangeText={this._onChangeWord}
               onSubmitEditing={!searchBar.isShowAddWord ? this._searchWebView : () => { this._searchWebView(); this.inputs['mean'].focus() }}
-              value={this.state.searchBar.word}
+              // value={this.state.searchBar.word}
               ref={input => this.inputs['word'] = input}
             />
             <TouchableOpacity style={{ paddingTop: 10, marginRight: 10, flexDirection: 'column', justifyContent: 'center' }}
@@ -250,25 +257,37 @@ class SearchView extends Component {
                 autoCapitalize={'none'}
                 onChangeText={mean => this.setState({ searchBar: { ...this.state.searchBar, mean } })}
                 onSubmitEditing={this._saveWord}
-                value={this.state.searchBar.mean}
+                // value={this.state.searchBar.mean}
                 ref={input => this.inputs['mean'] = input}
               />
-              <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginTop: 5 }}>
-                <TouchableOpacity onPress={this._saveWord}>
-                  <Text style={[{ paddingRight: 10, }, fonts.saveButton]}>Save</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => {
-                  this._clearAddWord()
-                  this.setState({ searchBar: { ...this.state.searchBar, isShowAddWord: false } })
-                }}>
-                  <Text style={[{ paddingRight: 10, }, fonts.cancelButton]}>Cancel</Text>
-                </TouchableOpacity>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', }}>
+                <View style={{flexDirection: 'row', justifyContent: 'flex-start', alignItems:'center'}}>
+                  <Text style={[{ marginLeft: 10, marginTop: 10, },]}>Web</Text>
+                  <Switch style={{ marginBottom: -10, transform: [{ scaleX: .6 }, { scaleY: .6 }] }} 
+                    value={this.state.webUri ? true : false}
+                    onValueChange={() => {
+                      if (this.state.webUri !== '') this.setState({webUri: ''})
+                      else this.setState({webUri: this.state.preWebUri})
+                    }}
+                  />
+                </View>
+                <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginTop: 10 }}>
+                  <TouchableOpacity onPress={this._saveWord}>
+                    <Text style={[{ paddingRight: 10, }, fonts.saveButton]}>Save</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => {
+                    this._clearAddWord()
+                    this.setState({ searchBar: { ...this.state.searchBar, isShowAddWord: false } })
+                  }}>
+                    <Text style={[{ paddingRight: 10, }, fonts.cancelButton]}>Cancel</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
             </View>
           }
         </Header>
-        <View style={{ flex: 1}}>
-          {this.state.webURI === '' ? <SearchStorageView /> : <SearchWebView source={{ uri: this.state.webURI }} />}
+        <View style={{ flex: 1 }}>
+          {this.state.webUri === '' ? <SearchStorageView /> : <SearchWebView source={{ uri: this.state.webUri }} />}
         </View>
       </KeyboardAvoidingView>
     )

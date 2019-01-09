@@ -94,7 +94,7 @@ class ExamView extends Component {
 			} else {
 				const word = newData[i].splice(index, 1)[0];
 				word.level = word.level !== 0 ? word.level - 1 : word.level
-				newData[word.level].push(word);
+				// newData[word.level].push(word);
 				break;
 			}
 		}

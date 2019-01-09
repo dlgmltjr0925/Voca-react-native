@@ -8,6 +8,7 @@ export default class CardView extends Component {
         onPress={this.props.onPress}
         onPressIn={this.props.onPressIn}
         onPressOut={this.props.onPressOut}
+        onLongPress={this.props.onLongPress}
         activeOpacity={this.props.activeOpacity || 0.8}>
         {this.props.children}
       </TouchableOpacity>
