@@ -37,12 +37,11 @@ class SearchView extends Component {
         isShowAddWord: false,
       },
       webUri: '',
-      preWebUri: '', 
+      preWebUri: '',
     }
   }
 
   componentWillReceiveProps = () => {
-    alert
     this.setState({ words: this.props.words })
   }
 
@@ -82,7 +81,7 @@ class SearchView extends Component {
     }
     const newWords = { ...this.props.words };
     const word = this.state.searchBar.word.trim();
-    let mean = this.state.searchBar.mean.trim().split('  ')
+    let mean = this.state.searchBar.mean.replace(/. /gi, '  ').trim().split('  ')
     const means = []
     mean.forEach((mean) => means.push({ mean }))
     let isChanged = true;
@@ -120,7 +119,9 @@ class SearchView extends Component {
         ])
     } else {
       // 새로 등록하는 단어일 경우
-      Alert.alert('단어 추가', `추가하시려는 단어가 ${word}가 맞습니까?`,
+      let content = ``
+      means.map((obj, index) => content += `${index + 1}. ${obj.mean}\n`)
+      Alert.alert(`${word}`, `${content}\n 단어를 추가하시겠습니까?`,
         [{
           text: 'Yes', onPress: () => {
             newWords[word] = {
@@ -166,8 +167,12 @@ class SearchView extends Component {
         content = { ...this.props.words[word] }
       } else {
         const temp = { ...this.props.words[word] }
-        temp.means.forEach(mean => { if (regExp.test(mean) && content !== temp) content = temp })
-        temp.memos.forEach(memo => { if (regExp.test(memo) && content !== temp) content = temp })
+        temp.means.forEach(mean => { if (regExp.test(mean.mean) && content !== temp) content = temp })
+        temp.memos.forEach(memo => {
+          memo.contents.forEach(memo => {
+            if (regExp.test(memo.content) && content !== temp) content = temp
+          })
+        })
       }
       if (content) {
         content['word'] = word
@@ -261,13 +266,13 @@ class SearchView extends Component {
                 ref={input => this.inputs['mean'] = input}
               />
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', }}>
-                <View style={{flexDirection: 'row', justifyContent: 'flex-start', alignItems:'center'}}>
+                <View style={{ flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center' }}>
                   <Text style={[{ marginLeft: 10, marginTop: 10, },]}>Web</Text>
-                  <Switch style={{ marginBottom: -10, transform: [{ scaleX: .6 }, { scaleY: .6 }] }} 
+                  <Switch style={{ marginBottom: -10, transform: [{ scaleX: .6 }, { scaleY: .6 }] }}
                     value={this.state.webUri ? true : false}
                     onValueChange={() => {
-                      if (this.state.webUri !== '') this.setState({webUri: ''})
-                      else this.setState({webUri: this.state.preWebUri})
+                      if (this.state.webUri !== '') this.setState({ webUri: '' })
+                      else this.setState({ webUri: this.state.preWebUri })
                     }}
                   />
                 </View>
