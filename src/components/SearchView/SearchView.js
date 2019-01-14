@@ -81,9 +81,9 @@ class SearchView extends Component {
     }
     const newWords = { ...this.props.words };
     const word = this.state.searchBar.word.trim();
-    let mean = this.state.searchBar.mean.replace(/. /gi, '  ').trim().split('  ')
+    let mean = this.state.searchBar.mean.replace(/\. /gi, '  ').trim().split('  ')
     const means = []
-    mean.forEach((mean) => means.push({ mean }))
+    mean.forEach((mean) => means.push({ mean: mean.trim() }))
     let isChanged = true;
     const now = new Date()
     if (newWords[word] !== undefined) {
