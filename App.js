@@ -20,7 +20,7 @@ const TabBarIcon = (props) => (<Image style={styles.tabBarIcon} source={props.so
 
 // 단어 검색 및 입력이 가능한 View
 const SearchStack = createStackNavigator({
-  Search: Views.SearchNavigator, 
+  Search: Views.SearchNavigator,
 })
 SearchStack.navigationOptions = {
   tabBarLabel: 'Search',
@@ -85,6 +85,19 @@ class App extends Component {
     const keys = await AsyncStorage.getAllKeys();
     if (!keys.includes('WORDS')) await AsyncStorage.setItem('WORDS', JSON.stringify(this.props.words))
     const words = JSON.parse(await AsyncStorage.getItem('WORDS'));
+    const now = new Date();
+    const refreshDate = new Date();
+    refreshDate.setDate(refreshDate.getDate() - 7);
+    const wordKeys = Object.keys(words);
+    console.log(words);
+    wordKeys.map((word) => {
+      const { level, updateDate } = words[word];
+      const update = new Date(updateDate);
+      if (level === 0 && refreshDate > update) {
+        words[word].level = 1;
+        words[word].updateDate = now;
+      }
+    })
     if (Object.keys(words).length > 0) this.props.handleLoadAllWords(words);
   }
 
@@ -114,7 +127,7 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = (state) => {
   return {
-    config: state.config.config, 
+    config: state.config.config,
     words: state.word.words
   }
 }
@@ -122,7 +135,8 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => {
   return {
     handleLoadConfig: (config) => { dispatch(configActions.loadConfig(config)) },
-    handleLoadAllWords: (words) => { dispatch(wordActions.loadAllWords(words)) }
+    handleLoadAllWords: (words) => { dispatch(wordActions.loadAllWords(words)) },
+    handleUpdateWord: (words) => { dispatch(wordActions.updateWord(words)) },
   }
 }
 
